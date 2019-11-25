@@ -109,22 +109,29 @@ interface ITextBoxState {
 export class TextBox extends React.Component<ITextBoxProps, ITextBoxState> {
   private inputElement: HTMLInputElement | null = null
 
-  public componentWillMount() {
-    const friendlyName = this.props.label || this.props.placeholder
+  public static getDerivedStateFromProps(
+    nextProps: ITextBoxProps,
+    prevState: ITextBoxState
+  ): Partial<ITextBoxState> | null {
+    if (prevState.value !== nextProps.value) {
+      return { value: nextProps.value }
+    }
+
+    return null
+  }
+
+  public constructor(props: ITextBoxProps) {
+    super(props)
+
+    const friendlyName = props.label || props.placeholder
     const inputId = createUniqueId(`TextBox_${friendlyName}`)
 
-    this.setState({ inputId, value: this.props.value })
+    this.state = { inputId, value: this.props.value }
   }
 
   public componentWillUnmount() {
     if (this.state.inputId) {
       releaseUniqueId(this.state.inputId)
-    }
-  }
-
-  public componentWillReceiveProps(nextProps: ITextBoxProps) {
-    if (this.state.value !== nextProps.value) {
-      this.setState({ value: nextProps.value })
     }
   }
 
